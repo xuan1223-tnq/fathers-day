@@ -453,8 +453,9 @@
     var imgs = slides[idx].querySelectorAll('.lazy-img[data-src]');
     imgs.forEach(function(img) {
       var src = img.getAttribute('data-src');
-      if (src && img.src !== src) {
+      if (src) {
         img.src = src;
+        img.removeAttribute('data-src');
       }
     });
   }
