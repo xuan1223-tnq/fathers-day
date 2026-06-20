@@ -172,6 +172,12 @@
     border-radius: 14px;
     box-shadow: 0 4px 20px rgba(120,80,40,0.12);
   }
+  .lazy-img:not([src]), .lazy-img[src=""]
+    min-height: 200px;
+    background: #fdf7f0;
+    border: 1px dashed #d4b896;
+    border-radius: 14px;
+  }
   .photo-caption {
     font-size: 0.85em;
     color: #a98467;
@@ -314,7 +320,7 @@
 <body>
 
 <!-- BGM -->
-<audio id="bgm" loop preload="auto" src="music.mp3"></audio>
+<audio id="bgm" loop preload="none" src="music.mp3"></audio>
 <button class="music-btn paused" id="musicBtn" aria-label="音乐开关">🎵</button>
 
 <div class="slides-container">
@@ -335,7 +341,7 @@
       <p class="card-to">致老邹</p>
       <p>又是一年父亲节，认真说起来好像从来没有正式的为你过过节。再说起来我甚至连您的生日也不知晓，我妈的我也不知道。说起来我这儿子当的也不称职，所以我权把父亲节和母亲节都当成你们的生日来过，算是投机取巧吧。</p>
     </div>
-    <img class="photo-img" src="images/p1.jpg" alt="老邹">
+    <img class="photo-img" data-src="images/p1.jpg" alt="老邹">
     <p class="photo-caption">意气风发的老邹</p>
   </section>
 
@@ -348,7 +354,7 @@
       <p>给您买东西吧，没有思路。发红包您也瞧不上我这一点，索性跟您掏点心窝子。</p>
       <p>其实我感觉我们虽然是父子，但是中间好像有莫大的隔阂。我好像看不清你，也猜不透你。我不知你的世界里是否有我。</p>
     </div>
-    <img class="photo-img" src="images/p2.jpg" alt="老邹">
+    <img class="photo-img" data-src="images/p2.jpg" alt="老邹">
     <p class="photo-caption">老邹臭美</p>
   </section>
 
@@ -360,7 +366,7 @@
       <p class="card-to">致老邹</p>
       <p>其实对您的记忆不算多，但是我知道您几乎从未打过我。在我心里您不是严厉类型的父亲。虽然很早跟我妈分开，我妈可能对您怨气有点大，但我没有讨厌和恨你。关于你的记忆都是好的，除了你喝醉后的一些。</p>
     </div>
-    <img class="photo-img" src="images/p3.jpg" alt="老邹">
+    <img class="photo-img" data-src="images/p3.jpg" alt="老邹">
     <p class="photo-caption">老邹难言的思念</p>
   </section>
 
@@ -372,7 +378,7 @@
       <p class="card-to">致老邹</p>
       <p>很开心您在外面闯荡出了一番名堂，但是还是担心您的身体。您的事情从来没和家里说过，这一路的颠簸都是您自己咽下。您只能靠抽烟喝酒缓解，但是还是希望您能节制。</p>
     </div>
-    <img class="photo-img" src="images/p4.jpg" alt="老邹">
+    <img class="photo-img" data-src="images/p4.jpg" alt="老邹">
     <p class="photo-caption">辛苦了老邹</p>
   </section>
 
@@ -384,7 +390,7 @@
       <p class="card-to">致老邹</p>
       <p>我之所以很想去工作，就是想让您不用再那么高强度的拼搏。作为儿子您是我最骄傲的榜样。您常说我这个大学生不如你，凡事实就是如此。我可能这辈子都无法超越您，得到您的认可。毕竟这条路您也走了近十年，我希望我能尽早成长起来，这样您就可以歇一歇了，喝喝茶、打打牌，这正是我所希望的。</p>
     </div>
-    <img class="photo-img" src="images/p5.jpg" alt="老邹">
+    <img class="photo-img" data-src="images/p5.jpg" alt="老邹">
     <p class="photo-caption">唯一一张合照</p>
   </section>
 
@@ -441,6 +447,18 @@
     arrowRight.style.opacity = current === total - 1 ? '0.25' : '1';
   }
 
+  // 图片懒加载：只加载当前页和相邻页的图片
+  function loadImagesForSlide(idx) {
+    if (idx < 0 || idx >= total) return;
+    var imgs = slides[idx].querySelectorAll('.lazy-img[data-src]');
+    imgs.forEach(function(img) {
+      var src = img.getAttribute('data-src');
+      if (src && img.src !== src) {
+        img.src = src;
+      }
+    });
+  }
+
   function goTo(index) {
     if (index === current || index < 0 || index >= total) return;
     const dir = index > current ? 'next' : 'prev';
@@ -456,6 +474,10 @@
 
     current = index;
     updateDots();
+    // 加载当前页及相邻页的图片（预加载下一页，体验更流畅）
+    loadImagesForSlide(current - 1);
+    loadImagesForSlide(current);
+    loadImagesForSlide(current + 1);
   }
 
   function next() { if (current < total - 1) goTo(current + 1); }
@@ -490,6 +512,10 @@
   });
 
   updateDots();
+
+  // 初始加载：首页和下一页的图片
+  loadImagesForSlide(0);
+  loadImagesForSlide(1);
 
   // ---- BGM ----
   const bgm = document.getElementById('bgm');
