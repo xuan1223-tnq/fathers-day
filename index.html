@@ -172,7 +172,7 @@
     border-radius: 14px;
     box-shadow: 0 4px 20px rgba(120,80,40,0.12);
   }
-  .lazy-img:not([src]), .lazy-img[src=""]
+  .lazy-img:not([src]), .lazy-img[src=""] {
     min-height: 200px;
     background: #fdf7f0;
     border: 1px dashed #d4b896;
@@ -440,9 +440,10 @@
   }
 
   function updateDots() {
-    Array.from(dotsEl.children).forEach((d, i) => {
-      d.classList.toggle('active', i === current);
-    });
+    var dots = dotsEl.children;
+    for (var di = 0; di < dots.length; di++) {
+      dots[di].classList.toggle('active', di === current);
+    }
     arrowLeft.style.opacity = current === 0 ? '0.25' : '1';
     arrowRight.style.opacity = current === total - 1 ? '0.25' : '1';
   }
@@ -451,13 +452,14 @@
   function loadImagesForSlide(idx) {
     if (idx < 0 || idx >= total) return;
     var imgs = slides[idx].querySelectorAll('.lazy-img[data-src]');
-    imgs.forEach(function(img) {
+    for (var i = 0; i < imgs.length; i++) {
+      var img = imgs[i];
       var src = img.getAttribute('data-src');
       if (src) {
         img.src = src;
         img.removeAttribute('data-src');
       }
-    });
+    }
   }
 
   function goTo(index) {
